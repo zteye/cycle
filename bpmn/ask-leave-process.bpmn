@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_09ld4uq" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="2.0.3">
+  <bpmn:process id="qloud__qloudflow_example_process_askleave__v2.0" name="ask_leave" isExecutable="true" camunda:candidateStarterGroups="employee, user" camunda:candidateStarterUsers="mathews, ma" camunda:versionTag="v2.0">
+    <bpmn:startEvent id="qloudflow_example_process_askleave_startEvent_startprocess" name="StartEvent_startprocess" camunda:formKey="/flowList/leaveForm">
+      <bpmn:outgoing>SequenceFlow_1s3txlp</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_1s3txlp" sourceRef="qloudflow_example_process_askleave_startEvent_startprocess" targetRef="ExclusiveGateway_0wmnb27" />
+    <bpmn:serviceTask id="qloudflow_example_process_askleave_task_deduct_salary" name="task_deduct_salary" camunda:type="external" camunda:topic="qloudflow_task_topic">
+      <bpmn:incoming>SequenceFlow_1bh9il8</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_0ha3e3p</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0iir4qr</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="EndEvent_1xguzou">
+      <bpmn:incoming>SequenceFlow_0iir4qr</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_1c4xzxt</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0iir4qr" sourceRef="qloudflow_example_process_askleave_task_deduct_salary" targetRef="EndEvent_1xguzou" />
+    <bpmn:exclusiveGateway id="ExclusiveGateway_0wmnb27" name="decide_on_leave_days">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_1s3txlp</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1bh9il8</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_0skhs5j</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_1bh9il8" name="leave_days &#60; 3" sourceRef="ExclusiveGateway_0wmnb27" targetRef="qloudflow_example_process_askleave_task_deduct_salary">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${ leave_days &lt; 3 }</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_0skhs5j" name="leave_days &#62; 3" sourceRef="ExclusiveGateway_0wmnb27" targetRef="qloudflow_example_process_askleave_task_aprove_leave">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${ leave_days &gt;= 3 }</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:userTask id="qloudflow_example_process_askleave_task_aprove_leave" name="task_aprove_leave" camunda:formKey="/flowList/leaveForm" camunda:candidateUsers="mamq" camunda:candidateGroups="manager">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="Input_user_name" />
+          <camunda:inputParameter name="Input_leave_days">0</camunda:inputParameter>
+          <camunda:outputParameter name="Output_approve_res">true</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0skhs5j</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_06qdeks</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="SequenceFlow_0ha3e3p" name="approve_res == true" sourceRef="ExclusiveGateway_0nf95i9" targetRef="qloudflow_example_process_askleave_task_deduct_salary">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${ approve_res == true }</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_0nf95i9">
+      <bpmn:incoming>SequenceFlow_06qdeks</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0ha3e3p</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_1c4xzxt</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_06qdeks" sourceRef="qloudflow_example_process_askleave_task_aprove_leave" targetRef="ExclusiveGateway_0nf95i9" />
+    <bpmn:sequenceFlow id="SequenceFlow_1c4xzxt" name="approve_res == false" sourceRef="ExclusiveGateway_0nf95i9" targetRef="EndEvent_1xguzou">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${ approve_res == false }</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="qloudflow_example_process_askleave">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="qloudflow_example_process_askleave_startEvent_startprocess">
+        <dc:Bounds x="173" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="149" y="145" width="85" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1s3txlp_di" bpmnElement="SequenceFlow_1s3txlp">
+        <di:waypoint x="209" y="120" />
+        <di:waypoint x="413" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_1k76gco_di" bpmnElement="qloudflow_example_process_askleave_task_deduct_salary">
+        <dc:Bounds x="613" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_1xguzou_di" bpmnElement="EndEvent_1xguzou">
+        <dc:Bounds x="899" y="227" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0iir4qr_di" bpmnElement="SequenceFlow_0iir4qr">
+        <di:waypoint x="713" y="120" />
+        <di:waypoint x="751" y="120" />
+        <di:waypoint x="902" y="235" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0wmnb27_di" bpmnElement="ExclusiveGateway_0wmnb27" isMarkerVisible="true">
+        <dc:Bounds x="413" y="95" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="401" y="65" width="84" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1bh9il8_di" bpmnElement="SequenceFlow_1bh9il8">
+        <di:waypoint x="463" y="120" />
+        <di:waypoint x="613" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="501" y="102" width="75" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0skhs5j_di" bpmnElement="SequenceFlow_0skhs5j">
+        <di:waypoint x="438" y="145" />
+        <di:waypoint x="438" y="357" />
+        <di:waypoint x="488" y="357" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="416" y="248" width="75" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="UserTask_0c46t6p_di" bpmnElement="qloudflow_example_process_askleave_task_aprove_leave">
+        <dc:Bounds x="488" y="317" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0ha3e3p_di" bpmnElement="SequenceFlow_0ha3e3p">
+        <di:waypoint x="663" y="332" />
+        <di:waypoint x="663" y="160" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="640" y="243" width="77" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0nf95i9_di" bpmnElement="ExclusiveGateway_0nf95i9" isMarkerVisible="true">
+        <dc:Bounds x="638" y="332" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_06qdeks_di" bpmnElement="SequenceFlow_06qdeks">
+        <di:waypoint x="588" y="357" />
+        <di:waypoint x="638" y="357" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1c4xzxt_di" bpmnElement="SequenceFlow_1c4xzxt">
+        <di:waypoint x="687" y="356" />
+        <di:waypoint x="813" y="291" />
+        <di:waypoint x="901" y="252" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="713" y="306" width="77" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
